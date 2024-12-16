@@ -1,12 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Inject, Sse } from '@nestjs/common';
 import { AppService } from './app.service';
+import { Observable, map } from 'rxjs';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+ 
 }

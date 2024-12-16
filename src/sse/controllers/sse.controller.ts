@@ -6,8 +6,8 @@ import { SseService } from '../services/sse.service';
 export class SseController {
 
     @Inject() appService: SseService;
-    
-    @Sse('events')
+
+    @Sse('chats')
     getSse(): Observable<MessageEvent> {
       return this.appService.getSseObservable().pipe(
         map((data) => {

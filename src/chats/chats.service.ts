@@ -10,6 +10,7 @@ export class ChatsService {
 
   checkExists = async (data: CheckChatExistsData): Promise<boolean> => {
     const { userId } = data;
+    console.log(userId);
     return !!(await this.usersRepository.findOne({ where: { userId } }));
   };
 }

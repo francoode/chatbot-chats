@@ -7,8 +7,6 @@ import { ChatCreateData, CheckChatExistsData } from 'src/types/chat.types';
 export class ChatsController {
   @Inject() private readonly chatsService: ChatsService;
 
-  //@todo pasar a helper y a lib compartida
-
   @MessagePattern('chat_check_exists') 
   async check(data: CheckChatExistsData) {
     await this.chatsService.checkExists(data);

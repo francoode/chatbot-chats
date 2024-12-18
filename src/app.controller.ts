@@ -3,7 +3,4 @@ import { AppService } from './app.service';
 import { Observable, map } from 'rxjs';
 
 @Controller()
-export class AppController {
-
- 
-}
+export class AppController {}

@@ -6,13 +6,13 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'chats' })
 export class Chat {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ nullable: false })
-  userId: string;
+  userId: number;
 
   @CreateDateColumn()
   createdAt: Date;

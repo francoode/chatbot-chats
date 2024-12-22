@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ChatsModule } from './chats/chats.module';
 import { MessagesModule } from './messages/messages.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Chat } from './chats/entities/chat.model';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: 'root',
       password: 'appmodule',
       database: 'chat_bot',
-      entities: [],
+      entities: [Chat],
       synchronize: true,
     }),
   ],

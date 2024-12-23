@@ -1,17 +1,35 @@
-import { ParseIntPipe } from "@nestjs/common";
-import { IsNotEmpty, IsNumberString } from "class-validator";
+import { Type } from "class-transformer";
+import { IsNotEmpty, IsNumber, IsNumberString } from "class-validator";
 
 export type ChatCreateData = {
-    userId: string;
+    userId: number;
     
 }
 
 export type CheckChatExistsData = {
-    userId: string;
+    userId: number;
 }
 
 export class CreateChatDto {
+    @Type(() => Number)
     @IsNotEmpty()
-    @IsNumberString()
-    userId: string;
+    @IsNumber()
+    userId: number;
+}
+
+export class AddMessage {
+    @Type(() => Number)
+    @IsNotEmpty()
+    @IsNumber()
+    chatId: number;
+
+    @Type(() => Number)
+    @IsNotEmpty()
+    @IsNumber()
+    optionSelectedId: number;
+
+    @Type(() => Number)
+    @IsNotEmpty()
+    @IsNumber()
+    presetMessageId: number;
 }

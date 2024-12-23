@@ -10,24 +10,19 @@ import { CHAT_QUEUE } from '@chatbot/shared-lib';
 @Injectable()
 export class ChatsService {
   @InjectRepository(Chat) private chatRepositroy: Repository<Chat>;
-  //  @Client(userServiceClient) userClient: ClientProxy;
+  @Client(userServiceClient) userClient: ClientProxy;
 
-  getOneOrFail = async (id: string) => {
-    const entity = await this.chatRepositroy.findOneBy({ userId: Number(id) });
-    if(!entity) throw new NotFoundException('Invalid userId');
+  getByIdOrFail = async (id: number) => {
+    return await this.chatRepositroy.findOneByOrFail({ id });
+  }
+  getByClientOrFail = async (userId: number) => {
+    const entity = await this.chatRepositroy.findOneBy({ userId });
+    if (!entity) throw new NotFoundException('Invalid userId');
     return entity;
   };
 
   create = (body: CreateChatDto) => {
-    return this.chatRepositroy.create({userId: Number(body.userId)})
-  }
-
-  /* checkExists = async (data: CheckChatExistsData): Promise<void> => {
-    const { userId } = data;
-    const exists = !!(await this.usersRepository.findOne({
-      where: { userId },
-    }));
-
-    this.userClient.emit(CHAT_QUEUE, {});
-  }; */
+    const { userId } = body;
+    return this.chatRepositroy.create({ userId });
+  };
 }

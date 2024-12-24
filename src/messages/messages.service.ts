@@ -1,10 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatsService } from 'src/chats/chats.service';
 import { AddMessage } from 'src/types/chat.types';
 import { Message } from './entities/message.model';
 import { Repository } from 'typeorm';
-import { PresetMessage } from './entities/preset-message.model';
+import {
+  PresetMessage,
+  PresetMessageTree,
+} from './entities/preset-message.model';
+import { Chat } from 'src/chats/entities/chat.model';
 
 @Injectable()
 export class MessagesService {
@@ -28,6 +32,19 @@ export class MessagesService {
       (opt) => Number(opt) === Number(optionSelectedId),
     );
 
+    if (!msgResponse) throw new NotFoundException('Invalid option');
 
+    return this.presetRepository.findOneByOrFail({ id: msgResponse.id });
+  };
+
+  createRootMessage = async (body: Chat) => {
+    const {} = body;
+    const rootMessage = await this.presetRepository.findOneByOrFail({
+      type: PresetMessageTree.ROOT,
+    });
+
+    if(!rootMessage) throw new NotFoundException();
+
+    return rootMessage;
   };
 }

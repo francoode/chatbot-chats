@@ -6,7 +6,7 @@ import { Chat } from './entities/chat.model';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Chat])],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, ChatsService],
   controllers: [ChatsController],
   providers: [ChatsService],
 })

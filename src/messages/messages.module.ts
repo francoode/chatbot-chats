@@ -10,5 +10,6 @@ import { PresetMessage } from './entities/preset-message.model';
   controllers: [MessagesController],
   providers: [MessagesService],
   imports: [TypeOrmModule.forFeature([Message, PresetMessage]), ChatsModule],
+  exports: [TypeOrmModule]
 })
 export class MessagesModule {}

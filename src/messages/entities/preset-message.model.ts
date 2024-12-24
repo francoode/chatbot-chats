@@ -25,7 +25,7 @@ export class PresetMessage {
   @Column({ nullable: false })
   text: string;
 
-  @Column({ nullable: false, enum: PresetMessageTree })
+  @Column({ nullable: false,  type: 'enum', enum: PresetMessageTree, default: PresetMessageTree.LEAVES })
   type: PresetMessageTree;
 
   @OneToOne(() => PresetMessage, (mensaje) => mensaje.id)
@@ -51,7 +51,7 @@ export class PresetMessage {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @BeforeInsert()
+  /* @BeforeInsert()
   @BeforeUpdate()
   validarCampos() {
     if (this.type === PresetMessageTree.ROOT && !this.previousMessageId)
@@ -63,5 +63,5 @@ export class PresetMessage {
       throw new Error(
         'A message with a previous message set cannot be marked as root.',
       );
-  }
+  } */
 }

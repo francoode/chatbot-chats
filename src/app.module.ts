@@ -5,13 +5,23 @@ import { ChatsModule } from './chats/chats.module';
 import { MessagesModule } from './messages/messages.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Chat } from './chats/entities/chat.model';
-import { bdConfig } from './typeorm.config';
+import { PresetMessage } from './messages/entities/preset-message.model';
+import { Message } from './messages/entities/message.model';
 
 @Module({
   imports: [
     ChatsModule,
     MessagesModule,
-    TypeOrmModule.forRoot(bdConfig),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'db',
+      port: Number(3306),
+      username: 'root',
+      password: 'appmodule',
+      database: 'chat_bot',
+      entities: [Chat, PresetMessage, Message],
+      synchronize: true,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

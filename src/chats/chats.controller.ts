@@ -1,5 +1,5 @@
 import { USER_NEW_EVENT } from '@chatbot/shared-lib';
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Query } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { CreateChatDto } from 'src/types/chat.types';
 import { ChatsService } from './chats.service';
@@ -9,9 +9,14 @@ import { ChatsService } from './chats.service';
 export class ChatsController {
   @Inject() private readonly chatsService: ChatsService;
 
-  @Get('client/:id')
+  @Get('users/:id')
   getByClient(@Param('id') id: number) {
     return this.chatsService.getByClientOrFail(id);
+  }
+
+  @Get()
+  get(@Query('id') id: number) {
+    return this.chatsService.getByIdOrFail(id);
   }
 
   @Post()

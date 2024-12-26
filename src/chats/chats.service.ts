@@ -4,25 +4,38 @@ import { CheckChatExistsData, CreateChatDto } from 'src/types/chat.types';
 import { Chat } from './entities/chat.model';
 import { Repository } from 'typeorm';
 import { Client, ClientProxy } from '@nestjs/microservices';
-import { userServiceClient } from 'src/shared/helper';
-import { CHAT_QUEUE } from '@chatbot/shared-lib';
+import { chatServiceClient, userServiceClient } from 'src/shared/helper';
+import { CHAT_CREATE_EVENT, CHAT_QUEUE } from '@chatbot/shared-lib';
 
 @Injectable()
 export class ChatsService {
-  @InjectRepository(Chat) private chatRepositroy: Repository<Chat>;
+  @InjectRepository(Chat) private chatRepository: Repository<Chat>;
   @Client(userServiceClient) userClient: ClientProxy;
+  @Client(chatServiceClient) chatClient: ClientProxy;
 
   getByIdOrFail = async (id: number) => {
-    return await this.chatRepositroy.findOneByOrFail({ id });
+    const chat = await this.chatRepository.findOne({
+      where: { id},
+      relations: [
+        'messages', 
+        'messages.presetMessage', 
+        'messages.presetMessage.options',
+        'messages.presetMessage.options.option'
+      ],
+    });
+    return chat;
   }
   getByClientOrFail = async (userId: number) => {
-    const entity = await this.chatRepositroy.findOneBy({ userId });
+    const entity = await this.chatRepository.findOneBy({ userId });
     if (!entity) throw new NotFoundException('Invalid userId');
     return entity;
   };
 
-  create = (body: CreateChatDto) => {
+  create = async (body: CreateChatDto) => {
     const { userId } = body;
-    return this.chatRepositroy.create({ userId });
+    const chat =  this.chatRepository.create({ userId });
+    await this.chatRepository.save(chat);
+
+    this.chatClient.emit(CHAT_CREATE_EVENT, chat)
   };
 }

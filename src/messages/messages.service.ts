@@ -13,8 +13,12 @@ import { Chat } from 'src/chats/entities/chat.model';
 @Injectable()
 export class MessagesService {
   @Inject() chatService: ChatsService;
+
   @InjectRepository(PresetMessage)
   private presetRepository: Repository<PresetMessage>;
+
+  @InjectRepository(Message)
+  private messageRepository: Repository<Message>;
 
   addMessageToChat = async (body: AddMessage) => {
     const { chatId, optionSelectedId, presetMessageId } = body;
@@ -38,13 +42,24 @@ export class MessagesService {
   };
 
   createRootMessage = async (body: Chat) => {
-    const {} = body;
+    const { id, userId } = body;
     const rootMessage = await this.presetRepository.findOneByOrFail({
       type: PresetMessageTree.ROOT,
     });
+    if (!rootMessage) throw new NotFoundException();
 
-    if(!rootMessage) throw new NotFoundException();
+    const newMessage = this.messageRepository.create({
+      chat: body,
+      presetMessage: rootMessage,
+      userId
+    });
+    
+    await this.messageRepository.save(newMessage);
 
-    return rootMessage;
+    
+
+
+    console.log(newMessage);
+    return newMessage;
   };
 }

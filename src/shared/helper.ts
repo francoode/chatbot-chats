@@ -8,3 +8,11 @@ export const userServiceClient: ClientOptions = {
     queue: 'USER_QUEUE',
   },
 };
+
+export const chatServiceClient: ClientOptions = {
+  transport: 5,
+  options: {
+    urls: [`amqp://user:password@rabbitmq:5672`],
+    queue: 'CHAT_QUEUE',
+  },
+};

@@ -16,6 +16,7 @@ export class MessagesController {
 
   @MessagePattern(CHAT_CREATE_EVENT)
   async chatCreate(data: Chat) {
+    console.log('create new chat event');
     await this.messagesService.createRootMessage(data);
   }
 

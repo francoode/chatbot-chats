@@ -4,7 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
+  ManyToOne,
 } from 'typeorm';
+import { PresetMessage } from './preset-message.model';
+import { Chat } from 'src/chats/entities/chat.model';
 
 @Entity()
 export class Message {
@@ -12,10 +16,13 @@ export class Message {
   id: number;
 
   @Column({ nullable: false })
-  clientId: string;
+  userId: number;
 
-  @Column()
-  chatId: string;
+  @ManyToOne(() => Chat, (chat) => chat.messages)
+  chat: Chat;
+
+  @ManyToOne(() => PresetMessage, {eager: true})
+  presetMessage: PresetMessage;
 
   @CreateDateColumn()
   createdAt: Date;

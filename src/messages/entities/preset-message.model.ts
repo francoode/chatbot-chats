@@ -9,7 +9,9 @@ import {
   OneToOne,
   ManyToMany,
   JoinTable,
+  OneToMany,
 } from 'typeorm';
+import { PresetMessageOption } from './preset-options.model';
 
 export enum PresetMessageTree {
   ROOT = 'ROOT', //raiz
@@ -31,19 +33,10 @@ export class PresetMessage {
   @OneToOne(() => PresetMessage, (mensaje) => mensaje.id)
   previousMessageId: number;
 
-  @ManyToMany(() => PresetMessage)
-  @JoinTable({
-    name: 'preset_message_options',
-    joinColumn: {
-      name: 'preset_message_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'option_message_id',
-      referencedColumnName: 'id',
-    },
+  @OneToMany(() => PresetMessageOption, (option) => option.parentMessage, {
+    cascade: true,
   })
-  options: PresetMessage[];
+  options: PresetMessageOption[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Chat } from './chats/entities/chat.model';
 import { PresetMessage } from './messages/entities/preset-message.model';
 import { Message } from './messages/entities/message.model';
+import { PresetMessageOption } from './messages/entities/preset-options.model';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { Message } from './messages/entities/message.model';
       username: 'root',
       password: 'appmodule',
       database: 'chat_bot',
-      entities: [Chat, PresetMessage, Message],
+      entities: [Chat, PresetMessage, Message, PresetMessageOption],
       synchronize: true,
     }),
   ],

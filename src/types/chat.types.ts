@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsNumberString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsNumberString, IsString } from "class-validator";
 
 export type ChatCreateData = {
     userId: number;
@@ -15,6 +15,10 @@ export class CreateChatDto {
     @IsNotEmpty()
     @IsNumber()
     userId: number;
+
+    @IsNotEmpty()
+    @IsString()
+    internalId: string;
 }
 
 export class AddMessage {

@@ -9,16 +9,21 @@ import {
   PresetMessageTree,
 } from './entities/preset-message.model';
 import { Chat } from 'src/chats/entities/chat.model';
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class MessagesService {
   @Inject() chatService: ChatsService;
-
   @InjectRepository(PresetMessage)
   private presetRepository: Repository<PresetMessage>;
-
   @InjectRepository(Message)
   private messageRepository: Repository<Message>;
+
+  private dataSubject = new Subject<any>();
+
+  getDataStream() {
+    return this.dataSubject.asObservable();
+  }
 
   addMessageToChat = async (body: AddMessage) => {
     const { chatId, optionSelectedId, presetMessageId } = body;
@@ -38,7 +43,9 @@ export class MessagesService {
 
     if (!msgResponse) throw new NotFoundException('Invalid option');
 
-    return this.presetRepository.findOneByOrFail({ id: msgResponse.id });
+    const preset = this.presetRepository.findOneByOrFail({ id: msgResponse.id });
+
+    this.dataSubject.next({message: preset});
   };
 
   createRootMessage = async (body: Chat) => {
@@ -55,11 +62,7 @@ export class MessagesService {
     });
     
     await this.messageRepository.save(newMessage);
-
     
-
-
-    console.log(newMessage);
-    return newMessage;
+    this.dataSubject.next({message: newMessage});
   };
 }

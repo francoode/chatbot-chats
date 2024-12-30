@@ -5,9 +5,9 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.enableCors()
+  
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
@@ -15,7 +15,6 @@ async function bootstrap() {
       queue: 'CHAT_QUEUE',
     },
   });
-
   await app.startAllMicroservices();
 
   await app.listen(process.env.PORT ?? 3000);

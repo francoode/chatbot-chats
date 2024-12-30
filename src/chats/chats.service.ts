@@ -15,7 +15,20 @@ export class ChatsService {
 
   getByIdOrFail = async (id: number) => {
     const chat = await this.chatRepository.findOne({
-      where: { id},
+      where: { id },
+      relations: [
+        'messages', 
+        'messages.presetMessage', 
+        'messages.presetMessage.options',
+        'messages.presetMessage.options.option'
+      ],
+    });
+    return chat;
+  }
+
+  getByInternalId = async (internalId: string) => {
+    const chat = await this.chatRepository.findOne({
+      where: { internalId },
       relations: [
         'messages', 
         'messages.presetMessage', 

@@ -13,6 +13,9 @@ export class Chat {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: false, unique: true })
+  internalId: string;
+
   @Column({ nullable: false })
   userId: number;
 

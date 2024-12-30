@@ -15,8 +15,8 @@ export class ChatsController {
   }
 
   @Get()
-  get(@Query('id') id: number) {
-    return this.chatsService.getByIdOrFail(id);
+  get(@Query('internalId') internalId: string) {
+    return this.chatsService.getByInternalId(internalId);
   }
 
   @Post()

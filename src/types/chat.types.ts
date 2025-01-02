@@ -10,6 +10,11 @@ export type CheckChatExistsData = {
     userId: number;
 }
 
+export enum SourceMessage {
+    CLIENT = "CLIENT",
+    SERVER = "SERVER",
+}
+
 export class CreateChatDto {
     @Type(() => Number)
     @IsNotEmpty()

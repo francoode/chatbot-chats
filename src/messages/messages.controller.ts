@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Sse } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Post, Sse, UseInterceptors } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { AddMessage } from 'src/types/chat.types';
 import { CHAT_CREATE_EVENT } from '@chatbot/shared-lib';
@@ -15,6 +15,7 @@ export class MessagesController {
     await this.messagesService.addMessageToChat(body);
   }
 
+  ///Implementar SAGA
   @MessagePattern(CHAT_CREATE_EVENT)
   async chatCreate(data: Chat) {
     await this.messagesService.createRootMessage(data);

@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { PresetMessage } from './preset-message.model';
 
 @Entity()
@@ -10,11 +17,11 @@ export class PresetMessageOption {
   title: string;
 
   @ManyToOne(() => PresetMessage, (message) => message.options, {
-    onDelete: 'CASCADE',
-    eager: true,
+    onDelete: 'CASCADE', // Elimina opciones si se elimina el mensaje padre
   })
-  parentMessage: PresetMessage;
+  optionMessage: PresetMessage;
 
-  @ManyToOne(() => PresetMessage, { onDelete: 'CASCADE' })
-  option: PresetMessage;
+  @OneToOne(() => PresetMessage, (message) => message.id, { eager: true, onDelete: 'CASCADE' })
+  @JoinColumn() 
+  presetMessageDisplay: PresetMessage;
 }

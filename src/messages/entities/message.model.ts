@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { PresetMessage } from './preset-message.model';
 import { Chat } from 'src/chats/entities/chat.model';
+import { SourceMessage } from 'src/types/chat.types';
 
 @Entity()
 export class Message {
@@ -18,10 +19,13 @@ export class Message {
   @Column({ nullable: false })
   userId: number;
 
+  @Column({ nullable: false })
+  source: SourceMessage;
+
   @ManyToOne(() => Chat, (chat) => chat.messages)
   chat: Chat;
 
-  @ManyToOne(() => PresetMessage, {eager: true})
+  @ManyToOne(() => PresetMessage, { eager: true })
   presetMessage: PresetMessage;
 
   @CreateDateColumn()

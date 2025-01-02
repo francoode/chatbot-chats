@@ -1,36 +1,20 @@
-import { Injectable, NotFoundException, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { CheckChatExistsData, CreateChatDto } from 'src/types/chat.types';
-import { Chat } from './entities/chat.model';
-import { Repository } from 'typeorm';
+import { CHAT_CREATE_EVENT } from '@chatbot/shared-lib';
+import {
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
 import { Client, ClientProxy } from '@nestjs/microservices';
+import { InjectRepository } from '@nestjs/typeorm';
 import { chatServiceClient, userServiceClient } from 'src/shared/helper';
-import { CHAT_CREATE_EVENT, CHAT_QUEUE } from '@chatbot/shared-lib';
-import { Subject } from 'rxjs';
+import { CreateChatDto } from 'src/types/chat.types';
+import { Repository } from 'typeorm';
+import { Chat } from './entities/chat.model';
 
 @Injectable()
-export class ChatsService implements OnModuleInit {
+export class ChatsService {
   @InjectRepository(Chat) private chatRepository: Repository<Chat>;
   @Client(userServiceClient) userClient: ClientProxy;
   @Client(chatServiceClient) chatClient: ClientProxy;
-
-  private dataSubject = new Subject<any>();
-
-  onModuleInit() {
-    // Simular la emisión de datos dinámicos cada 2 segundos
-    setInterval(() => {
-      console.log('evento emitido');
-      const value = {
-        message: 'Nuevo valor dinámico',
-        timestamp: new Date().toISOString(),
-      };
-      this.dataSubject.next(value);
-    }, 2000);
-  }
-
-  getDataStream() {
-    return this.dataSubject.asObservable();
-  }
 
   getByIdOrFail = async (id: number) => {
     const chat = await this.chatRepository.findOne({
@@ -39,24 +23,20 @@ export class ChatsService implements OnModuleInit {
         'messages',
         'messages.presetMessage',
         'messages.presetMessage.options',
-        'messages.presetMessage.options.option',
+        'messages.presetMessage.options.optionMessage',
       ],
     });
     return chat;
   };
 
   getByInternalId = async (internalId: string) => {
-    const chat = await this.chatRepository.findOne({
-      where: { internalId },
-      relations: [
-        'messages',
-        'messages.presetMessage',
-        'messages.presetMessage.options',
-        'messages.presetMessage.options.option',
-      ],
-    });
-
-    this.dataSubject.next(chat);
+    const chat = await this.chatRepository
+      .createQueryBuilder('chat')
+      .leftJoinAndSelect('chat.messages', 'messages')
+      .leftJoinAndSelect('messages.presetMessage', 'presetMessage')
+      .leftJoinAndSelect('presetMessage.options', 'options')
+      .where('chat.internalId = :id', { id: internalId })
+      .getOne();
 
     return chat;
   };
@@ -70,9 +50,7 @@ export class ChatsService implements OnModuleInit {
     const { userId, internalId } = body;
     const chat = this.chatRepository.create({ userId, internalId });
     await this.chatRepository.save(chat);
-
     this.chatClient.emit(CHAT_CREATE_EVENT, chat);
-
     return { id: chat.id, internalId: chat.internalId };
   };
 }

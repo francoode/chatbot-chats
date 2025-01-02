@@ -1,59 +1,45 @@
 import { USER_NEW_EVENT } from '@chatbot/shared-lib';
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Get,
   Inject,
   Param,
   Post,
-  Query,
-  Sse,
+  UseInterceptors
 } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { CreateChatDto } from 'src/types/chat.types';
 import { ChatsService } from './chats.service';
-import { interval, map, Observable } from 'rxjs';
+import { ChatSerializer } from './dtos/chat.dto';
 
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller('chats')
 export class ChatsController {
   @Inject() private readonly chatsService: ChatsService;
 
   @Get('users/:id')
-  getByClient(@Param('id') id: number) {
-    return this.chatsService.getByClientOrFail(id);
+  async getByClient(@Param('id') id: number) {
+    const chat = await this.chatsService.getByClientOrFail(id);
+    return new ChatSerializer(chat);
   }
 
+  
   @Get(':internalId')
-  get(@Param('internalId') internalId: string) {
-    return this.chatsService.getByInternalId(internalId);
+  async get(@Param('internalId') internalId: string): Promise<ChatSerializer> {
+    const chat = await this.chatsService.getByInternalId(internalId);
+    return new ChatSerializer(chat);
   }
 
   @Post()
-  create(@Body() body: CreateChatDto) {
-    return this.chatsService.create(body);
+  async create(@Body() body: CreateChatDto): Promise<ChatSerializer> {
+    const chat = await this.chatsService.create(body);
+    return new ChatSerializer(chat);
   }
 
   @MessagePattern(USER_NEW_EVENT)
   async userNewEvent(data: CreateChatDto) {
     await this.chatsService.create(data);
-  }
-
-  @Sse()
-  sendEvents(): Observable<MessageEvent> {
-
-    return this.chatsService.getDataStream().pipe(
-      map((count) => {
-        const event: MessageEvent = new MessageEvent('message', {
-          data: { message: `Evento #${count}`, timestamp: new Date().toISOString() },
-        });
-        return event;
-      })
-    );
-    
-   /*  return this.chatsService.getDataStream().pipe(
-      map((data) => {
-        return data as MessageEvent;
-      }),
-    ); */
   }
 }

@@ -30,7 +30,7 @@ export class Migrations1735008170290 implements MigrationInterface {
     await presetRepository.save(option1);
     await presetRepository.save(option2);
 
-    const optOne = optionRepository.create({
+    /* const optOne = optionRepository.create({
       title: 'Option 1',
       parentMessage: rootMessage,
       option: option1,
@@ -40,10 +40,10 @@ export class Migrations1735008170290 implements MigrationInterface {
       title: 'Option 2',
       parentMessage: rootMessage,
       option: option2
-    });
+    }); */
 
-    await optionRepository.save(optOne);
-    await optionRepository.save(optTwo);
+/*     await optionRepository.save(optOne);
+    await optionRepository.save(optTwo); */
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {}

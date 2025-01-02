@@ -10,8 +10,10 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { PresetMessageOption } from './preset-options.model';
+import { Message } from './message.model';
 
 export enum PresetMessageTree {
   ROOT = 'ROOT', //raiz
@@ -30,11 +32,14 @@ export class PresetMessage {
   @Column({ nullable: false,  type: 'enum', enum: PresetMessageTree, default: PresetMessageTree.LEAVES })
   type: PresetMessageTree;
 
-  @OneToOne(() => PresetMessage, (mensaje) => mensaje.id)
-  previousMessageId: number;
+  @ManyToOne(() => PresetMessage, (mensaje) => mensaje.id)
+  parentMessage: PresetMessage;
 
-  @OneToMany(() => PresetMessageOption, (option) => option.parentMessage, {
-    cascade: true,
+  @OneToMany(() => Message, (message) => message.presetMessage)
+  messages: Message[];
+
+  @OneToMany(() => PresetMessageOption, (option) => option.optionMessage, {
+    cascade: true, // Propaga operaciones de persistencia
   })
   options: PresetMessageOption[];
 
@@ -43,18 +48,4 @@ export class PresetMessage {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  /* @BeforeInsert()
-  @BeforeUpdate()
-  validarCampos() {
-    if (this.type === PresetMessageTree.ROOT && !this.previousMessageId)
-      throw new Error(
-        'A message cannot be created as root if it has a previous message set',
-      );
-
-    if (this.previousMessageId && this.type === PresetMessageTree.ROOT)
-      throw new Error(
-        'A message with a previous message set cannot be marked as root.',
-      );
-  } */
 }

@@ -19,7 +19,7 @@ export class Chat {
   @Column({ nullable: false })
   userId: number;
 
-  @OneToMany(() => Message, (message) => message.chat)
+  @OneToMany(() => Message, (message) => message.chat, {eager: true})
   messages: Message[];
 
   @CreateDateColumn()

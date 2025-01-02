@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatsService } from 'src/chats/chats.service';
-import { AddMessage } from 'src/types/chat.types';
+import { AddMessage, SourceMessage } from 'src/types/chat.types';
 import { Message } from './entities/message.model';
 import { Repository } from 'typeorm';
 import {
@@ -58,11 +58,11 @@ export class MessagesService {
     const newMessage = this.messageRepository.create({
       chat: body,
       presetMessage: rootMessage,
-      userId
+      userId,
+      source: SourceMessage.SERVER,
     });
     
     await this.messageRepository.save(newMessage);
-    
-    this.dataSubject.next({message: newMessage});
+
   };
 }

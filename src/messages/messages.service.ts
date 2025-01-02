@@ -10,6 +10,7 @@ import {
 } from './entities/preset-message.model';
 import { Chat } from 'src/chats/entities/chat.model';
 import { Subject } from 'rxjs';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class MessagesService {
@@ -23,6 +24,11 @@ export class MessagesService {
 
   getDataStream() {
     return this.dataSubject.asObservable();
+  }
+
+  getPreset = async(id: number) => {
+    console.log(id);
+    return this.presetRepository.findOneOrFail({ where: { id } });
   }
 
   addMessageToChat = async (body: AddMessage) => {
@@ -60,6 +66,7 @@ export class MessagesService {
       presetMessage: rootMessage,
       userId,
       source: SourceMessage.SERVER,
+      internalId: uuid()
     });
     
     await this.messageRepository.save(newMessage);

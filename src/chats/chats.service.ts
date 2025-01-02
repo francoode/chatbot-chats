@@ -39,7 +39,7 @@ export class ChatsService {
       .leftJoinAndSelect('presetMessage.options', 'options')
       .leftJoinAndSelect('options.presetMessageDisplay', 'presetMessageDisplay')
       .where('chat.internalId = :id', { id: internalId })
-      .getOne();
+      .getOneOrFail();
 
     return chat;
   };

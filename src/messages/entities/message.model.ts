@@ -22,6 +22,9 @@ export class Message {
   @Column({ nullable: false })
   source: SourceMessage;
 
+  @Column({ nullable: false })
+  internalId: string;
+
   @ManyToOne(() => Chat, (chat) => chat.messages)
   chat: Chat;
 

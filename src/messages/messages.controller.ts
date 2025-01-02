@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Post, Sse, UseInterceptors } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Get, Param, Post, Sse, UseInterceptors } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { AddMessage } from 'src/types/chat.types';
 import { CHAT_CREATE_EVENT } from '@chatbot/shared-lib';
@@ -14,6 +14,12 @@ export class MessagesController {
   async add(@Body() body: AddMessage) {
     await this.messagesService.addMessageToChat(body);
   }
+
+  @Get('presets/:id')
+  async getPreset(@Param('id') id: number) {
+    return await this.messagesService.getPreset(id);
+  }
+
 
   ///Implementar SAGA
   @MessagePattern(CHAT_CREATE_EVENT)

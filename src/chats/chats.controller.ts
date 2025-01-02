@@ -29,6 +29,7 @@ export class ChatsController {
   @Get(':internalId')
   async get(@Param('internalId') internalId: string): Promise<ChatSerializer> {
     const chat = await this.chatsService.getByInternalId(internalId);
+    console.log(chat);
     return new ChatSerializer(chat);
   }
 

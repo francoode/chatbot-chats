@@ -21,7 +21,7 @@ export class PresetMessageOption {
   })
   optionMessage: PresetMessage;
 
-  @OneToOne(() => PresetMessage, (message) => message.id, { eager: true, onDelete: 'CASCADE' })
-  @JoinColumn() 
+  @OneToOne(() => PresetMessage)
+  @JoinColumn()
   presetMessageDisplay: PresetMessage;
 }

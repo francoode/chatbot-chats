@@ -1,18 +1,20 @@
 import { CHAT_CREATE_EVENT } from '@chatbot/shared-lib';
-import {
-  Injectable,
-  NotFoundException
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Client, ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { chatServiceClient, userServiceClient } from 'src/shared/helper';
 import { CreateChatDto } from 'src/types/chat.types';
 import { Repository } from 'typeorm';
 import { Chat } from './entities/chat.model';
+import { PresetMessageOption } from 'src/messages/entities/preset-options.model';
 
 @Injectable()
 export class ChatsService {
   @InjectRepository(Chat) private chatRepository: Repository<Chat>;
+
+  @InjectRepository(PresetMessageOption)
+  private optRep: Repository<PresetMessageOption>;
+
   @Client(userServiceClient) userClient: ClientProxy;
   @Client(chatServiceClient) chatClient: ClientProxy;
 
@@ -35,6 +37,7 @@ export class ChatsService {
       .leftJoinAndSelect('chat.messages', 'messages')
       .leftJoinAndSelect('messages.presetMessage', 'presetMessage')
       .leftJoinAndSelect('presetMessage.options', 'options')
+      .leftJoinAndSelect('options.presetMessageDisplay', 'presetMessageDisplay')
       .where('chat.internalId = :id', { id: internalId })
       .getOne();
 

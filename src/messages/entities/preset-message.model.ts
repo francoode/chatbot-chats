@@ -29,7 +29,12 @@ export class PresetMessage {
   @Column({ nullable: false })
   text: string;
 
-  @Column({ nullable: false,  type: 'enum', enum: PresetMessageTree, default: PresetMessageTree.LEAVES })
+  @Column({
+    nullable: false,
+    type: 'enum',
+    enum: PresetMessageTree,
+    default: PresetMessageTree.LEAVES,
+  })
   type: PresetMessageTree;
 
   @ManyToOne(() => PresetMessage, (mensaje) => mensaje.id)

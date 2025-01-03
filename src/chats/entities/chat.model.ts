@@ -1,15 +1,15 @@
-import { Message } from 'src/messages/entities/message.model';
+
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
+import { ChatBot, MessageBot } from '@chatbot/shared-lib';
 
 @Entity({ name: 'chats' })
-export class Chat {
+export class Chat implements ChatBot {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -19,12 +19,11 @@ export class Chat {
   @Column({ nullable: false })
   userId: number;
 
-  @OneToMany(() => Message, (message) => message.chat, {eager: true})
-  messages: Message[];
-
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  messages: MessageBot[];
 }

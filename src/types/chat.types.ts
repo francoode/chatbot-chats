@@ -26,19 +26,3 @@ export class CreateChatDto {
     internalId: string;
 }
 
-export class AddMessage {
-    @Type(() => Number)
-    @IsNotEmpty()
-    @IsNumber()
-    chatId: number;
-
-    @Type(() => Number)
-    @IsNotEmpty()
-    @IsNumber()
-    optionSelectedId: number;
-
-    @Type(() => Number)
-    @IsNotEmpty()
-    @IsNumber()
-    presetMessageId: number;
-}

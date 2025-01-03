@@ -1,59 +1,42 @@
 import { CHAT_CREATE_EVENT } from '@chatbot/shared-lib';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Client, ClientProxy } from '@nestjs/microservices';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Client, ClientProxy } from '@chatbot/shared-lib';
 import { InjectRepository } from '@nestjs/typeorm';
-import { chatServiceClient, userServiceClient } from 'src/shared/helper';
+import { chatServiceClient, userServiceClient } from '@chatbot/shared-lib';
 import { CreateChatDto } from 'src/types/chat.types';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Chat } from './entities/chat.model';
-import { PresetMessageOption } from 'src/messages/entities/preset-options.model';
 
 @Injectable()
 export class ChatsService {
+  @Inject() dataSource: DataSource;
   @InjectRepository(Chat) private chatRepository: Repository<Chat>;
-
-  @InjectRepository(PresetMessageOption)
-  private optRep: Repository<PresetMessageOption>;
-
-  @Client(userServiceClient) userClient: ClientProxy;
   @Client(chatServiceClient) chatClient: ClientProxy;
 
   getByIdOrFail = async (id: number) => {
-    const chat = await this.chatRepository.findOne({
-      where: { id },
-      relations: [
-        'messages',
-        'messages.presetMessage',
-        'messages.presetMessage.options',
-        'messages.presetMessage.options.optionMessage',
-      ],
-    });
-    return chat;
+    return await this.chatRepository.findOneOrFail({ where: { id } });
   };
 
   getByInternalId = async (internalId: string) => {
-    const chat = await this.chatRepository
-      .createQueryBuilder('chat')
-      .leftJoinAndSelect('chat.messages', 'messages')
-      .leftJoinAndSelect('messages.presetMessage', 'presetMessage')
-      .leftJoinAndSelect('presetMessage.options', 'options')
-      .leftJoinAndSelect('options.presetMessageDisplay', 'presetMessageDisplay')
-      .where('chat.internalId = :id', { id: internalId })
-      .getOneOrFail();
-
-    return chat;
-  };
-  getByClientOrFail = async (userId: number) => {
-    const entity = await this.chatRepository.findOneBy({ userId });
-    if (!entity) throw new NotFoundException('Invalid userId');
-    return entity;
+    return await this.chatRepository.findOneOrFail({ where: { internalId } });
   };
 
   create = async (body: CreateChatDto) => {
-    const { userId, internalId } = body;
-    const chat = this.chatRepository.create({ userId, internalId });
-    await this.chatRepository.save(chat);
-    this.chatClient.emit(CHAT_CREATE_EVENT, chat);
-    return { id: chat.id, internalId: chat.internalId };
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const chat = await queryRunner.manager.save(Chat, body);
+      //@todo manage error
+      this.chatClient.emit(CHAT_CREATE_EVENT, chat);
+      await queryRunner.commitTransaction();
+      return { id: chat.id, internalId: chat.internalId };
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      throw e;
+    } finally {
+      await queryRunner.release();
+    }
   };
 }

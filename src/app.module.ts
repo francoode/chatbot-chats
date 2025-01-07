@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-
 import { ChatsModule } from './chats/chats.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Chat } from './chats/entities/chat.model';

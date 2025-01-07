@@ -19,9 +19,9 @@ import { ChatSerializer } from './dtos/chat.dto';
 export class ChatsController {
   @Inject() private readonly chatsService: ChatsService;
   
-  @Get(':internalId')
-  async get(@Param('internalId') internalId: string): Promise<ChatSerializer> {
-    const chat = await this.chatsService.getByInternalId(internalId);
+  @Get(':id')
+  async get(@Param('id') id: number): Promise<ChatSerializer> {
+    const chat = await this.chatsService.getByIdOrFail(id);
     return new ChatSerializer(chat);
   }
 

@@ -13,6 +13,5 @@ export const dataSource: DataSource = new DataSource({
   migrations: ['dist/migrations/*.js'],  
   synchronize: true,
 });
-console.log('object');
 
 
